@@ -3,9 +3,11 @@ import cv2
 import multiprocessing as _mp
 from src.utils import load_graph, mario, detect_hands, predict
 from src.config import ORANGE, RED, GREEN
+import keyboard
+import time
 
-tf.compat.v1.flags.DEFINE_integer("width", 640, "Screen width")
-tf.compat.v1.flags.DEFINE_integer("height", 480, "Screen height")
+tf.compat.v1.flags.DEFINE_integer("width", 1280, "Screen width")
+tf.compat.v1.flags.DEFINE_integer("height", 1280, "Screen height")
 tf.compat.v1.flags.DEFINE_float("threshold", 0.6, "Threshold for score")
 tf.compat.v1.flags.DEFINE_float("alpha", 0.3, "Transparent level")
 tf.compat.v1.flags.DEFINE_string("pre_trained_model_path", "src/pretrained_model.pb", "Path to pre-trained model")
@@ -29,11 +31,12 @@ def main():
             break
         _, frame = cap.read()
         frame = cv2.flip(frame, 1)
+        # cv2.imwrite("/Users/shaopengzheng/Desktop/HCI-handgesture-game/a.png", frame)
+
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         boxes, scores, classes = detect_hands(frame, graph, sess)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         results = predict(boxes, scores, classes, FLAGS.threshold, FLAGS.width, FLAGS.height)
-
         if len(results) == 1:
             x_min, x_max, y_min, y_max, category = results[0]
             x = int((x_min + x_max) / 2)
@@ -43,21 +46,41 @@ def main():
             if category == "Open" and x <= FLAGS.width / 3:
                 action = 7  # Left jump
                 text = "Jump left"
+                keyboard.press("left")
+                keyboard.press("up")
+                time.sleep(0.3)
+                keyboard.release("left")
+                keyboard.release("up")
             elif category == "Closed" and x <= FLAGS.width / 3:
                 action = 6  # Left
                 text = "Run left"
+                keyboard.press("left")
+                time.sleep(0.3)
+                keyboard.release("left")
             elif category == "Open" and FLAGS.width / 3 < x <= 2 * FLAGS.width / 3:
                 action = 5  # Jump
                 text = "Jump"
+                keyboard.press("up")
+                time.sleep(0.3)
+                keyboard.release("up")            
             elif category == "Closed" and FLAGS.width / 3 < x <= 2 * FLAGS.width / 3:
                 action = 0  # Do nothing
                 text = "Stay"
             elif category == "Open" and x > 2 * FLAGS.width / 3:
                 action = 2  # Right jump
                 text = "Jump right"
+                keyboard.press("right")
+                keyboard.press("up")
+                time.sleep(0.3)
+                keyboard.release("right")
+                keyboard.release("up")
             elif category == "Closed" and x > 2 * FLAGS.width / 3:
                 action = 1  # Right
                 text = "Run right"
+                keyboard.press("right")
+                time.sleep(0.3)
+                keyboard.release("right")
+
             else:
                 action = 0
                 text = "Stay"

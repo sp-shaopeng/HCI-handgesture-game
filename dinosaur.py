@@ -3,8 +3,11 @@ import cv2
 from src.utils import load_graph, dinosaur, detect_hands, predict
 from src.config import RED, GREEN, YELLOW
 import tensorflow as tf
-tf.compat.v1.flags.DEFINE_integer("width", 640, "Screen width")
-tf.compat.v1.flags.DEFINE_integer("height", 480, "Screen height")
+import keyboard
+import time
+
+tf.compat.v1.flags.DEFINE_integer("width", 1280, "Screen width")
+tf.compat.v1.flags.DEFINE_integer("height", 1280, "Screen height")
 tf.compat.v1.flags.DEFINE_float("threshold", 0.6, "Threshold for score")
 tf.compat.v1.flags.DEFINE_float("alpha", 0.3, "Transparent level")
 tf.compat.v1.flags.DEFINE_string("pre_trained_model_path", "src/pretrained_model.pb", "Path to pre-trained model")
@@ -44,9 +47,15 @@ def main():
             elif category == "Open" and y < FLAGS.height/2:
                 action = 1  # Jump
                 text = "Jump"
+                keyboard.press("up")
+                time.sleep(0.2)
+                keyboard.release("up")
             elif category == "Open" and y > FLAGS.height/2:
                 action = 2
                 text = "Duck"
+                keyboard.press("down")
+                time.sleep(0.2)
+                keyboard.release("down")
             else:
                 action = 0
                 text = "Run"
